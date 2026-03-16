@@ -19,7 +19,7 @@ def _clear_runs_modules() -> None:
 			del sys.modules[module_name]
 
 
-RUNNER_SOURCE = dedent(
+__RUNNER_SOURCE = dedent(
 	"""
 	from core.jobs import AbstractJob
 
@@ -52,7 +52,7 @@ def _write_demo_run_package(tmp_path: Path) -> Path:
 		"__all__ = ['Job', 'JOB_CLASS']\n",
 		encoding="utf-8",
 	)
-	(run_dir / "runner.py").write_text(RUNNER_SOURCE, encoding="utf-8")
+	(run_dir / "runner.py").write_text(__RUNNER_SOURCE, encoding="utf-8")
 
 	log_dir = tmp_path / "runtime-logs"
 	(config_dir / "default.yaml").write_text(
