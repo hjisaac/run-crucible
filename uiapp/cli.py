@@ -14,8 +14,8 @@ app = typer.Typer(
 )
 
 
-def _run_command(run_name: str, config: str = "default") -> None:
-	result = run_named_job(run_name, config)
+def _run_command(run_name: str, config: str = "default", overrides: list[str] | None = None) -> None:
+	result = run_named_job(run_name, config, overrides=overrides)
 	if result is not None:
 		typer.echo(result)
 
@@ -28,9 +28,15 @@ def _build_run_command(run_name: str) -> Any:
 			"-c",
 			help="YAML config name under runs/<run>/configs, with or without extension.",
 		),
+		overrides: list[str] = typer.Option(
+			None,
+			"--override",
+			"-o",
+			help="Hydra-style override(s), e.g. -o trainer.lr=1e-3 (repeat flag for multiple).",
+		),
 	) -> None:
 		"""Run a discovered crucible job."""
-		_run_command(run_name, config)
+		_run_command(run_name, config, overrides=overrides)
 
 	command.__name__ = f"run_{run_name}"
 	command.__doc__ = f"Run the {run_name} job."

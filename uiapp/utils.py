@@ -2,6 +2,7 @@ from __future__ import annotations
 
 import importlib
 import inspect
+import logging
 from pathlib import Path
 from typing import Any
 
@@ -13,6 +14,7 @@ from core.jobs import AbstractJob
 
 SUPPORTED_CONFIG_EXTENSIONS = (".yaml", ".yml")
 RUNS_ROOT = Path(__file__).resolve().parents[1] / "runs"
+logger = logging.getLogger(__name__)
 
 
 def list_available_runs() -> list[str]:
@@ -64,7 +66,7 @@ def resolve_job_class(run_name: str) -> type[AbstractJob]:
 	)
 
 
-def _resolve_config_path(run_name: str, config_name: str) -> tuple[Path, str]:
+def _resolve_config_path(run_name: str, config_name: str) -> tuple[Path, str, Path]:
 	run_dir = RUNS_ROOT / run_name
 	if not run_dir.exists():
 		raise FileNotFoundError(f"Run folder was not found: {run_dir}")
@@ -88,24 +90,49 @@ def _resolve_config_path(run_name: str, config_name: str) -> tuple[Path, str]:
 			f"Config '{config_name}' was not found for run '{run_name}'. Looked for: {looked_up}"
 		)
 
-	return config_dir, config_stem
+	return config_dir, config_stem, resolved
 
 
-def load_run_config(run_name: str, config_name: str) -> dict[str, Any]:
+def _sanitize_overrides(overrides: list[str] | None) -> list[str]:
+	if not overrides:
+		return []
+
+	return [item.strip() for item in overrides if item and item.strip()]
+
+
+def load_run_config(
+	run_name: str,
+	config_name: str,
+	overrides: list[str] | None = None,
+) -> tuple[dict[str, Any], Path, list[str]]:
 	run_name = run_name.strip().lower()
-	config_dir, config_stem = _resolve_config_path(run_name, config_name)
+	config_dir, config_stem, config_path = _resolve_config_path(run_name, config_name)
+	resolved_overrides = _sanitize_overrides(overrides)
 
 	with initialize_config_dir(version_base=None, config_dir=str(config_dir.resolve())):
-		config = compose(config_name=config_stem)
+		config = compose(config_name=config_stem, overrides=resolved_overrides)
 
 	resolved = OmegaConf.to_container(config, resolve=True)
 	if not isinstance(resolved, dict):
 		raise ValueError(f"Config '{config_name}' for run '{run_name}' must resolve to a dictionary.")
-	return resolved
+	return resolved, config_path, resolved_overrides
 
 
-def run_named_job(run_name: str, config_name: str) -> Any:
+def log_runtime_config(run_name: str, config_path: Path, config: dict[str, Any], overrides: list[str]) -> None:
+	overrides_display = ", ".join(overrides) if overrides else "none"
+	config_yaml = OmegaConf.to_yaml(OmegaConf.create(config), resolve=True)
+	logger.warning(
+		"Runtime config for run='%s' from '%s' | overrides=%s\n%s",
+		run_name,
+		config_path,
+		overrides_display,
+		config_yaml,
+	)
+
+
+def run_named_job(run_name: str, config_name: str, overrides: list[str] | None = None) -> Any:
 	job_class = resolve_job_class(run_name)
-	config = load_run_config(run_name, config_name)
+	config, config_path, resolved_overrides = load_run_config(run_name, config_name, overrides=overrides)
+	log_runtime_config(run_name, config_path, config, resolved_overrides)
 	job = job_class(config=config)
 	return job.run()
