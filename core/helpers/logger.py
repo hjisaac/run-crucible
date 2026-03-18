@@ -43,7 +43,7 @@ def _get_logging_config(
 	}
 
 
-def _configure_logging(config: dict[str, Any], job_id: str) -> None:
+def configure_logging(config: dict[str, Any], job_id: str) -> None:
 	"""Configure the root logger with a console handler and a per-run file handler.
 
 	Any logging.getLogger(__name__) call anywhere in the codebase will
@@ -59,7 +59,7 @@ def _configure_logging(config: dict[str, Any], job_id: str) -> None:
 	# Clean up any existing run_file: handler before reconfiguring
 	root = logging.getLogger()
 	for handler in list(root.handlers):
-		if handler.get_name().startswith(__RUN_FILE_PREFIX):
+		if (handler.get_name() or "").startswith(__RUN_FILE_PREFIX):
 			root.removeHandler(handler)
 			handler.close()
 

@@ -1,3 +1,16 @@
+Metadata-Version: 2.4
+Name: ml-research
+Version: 0.1.0
+Summary: Add your description here
+Requires-Python: >=3.13
+Description-Content-Type: text/markdown
+Requires-Dist: dotenv>=0.9.9
+Requires-Dist: hydra-core>=1.3.2
+Requires-Dist: rich>=14.3.3
+Requires-Dist: torch>=2.10.0
+Requires-Dist: typer>=0.24.1
+Requires-Dist: wandb>=0.25.0
+
 # run-crucible
 
 Composable Python job runner with dynamic job discovery, Hydra config overrides, and a Typer CLI.
@@ -105,13 +118,13 @@ tests/
 Use the create command:
 
 ```bash
-uv run crucible create my_experiment --job-type standalone
+uv run crucible create my_experiment --standalone
 ```
 
 Or scaffold a training job:
 
 ```bash
-uv run crucible create my_experiment --job-type training
+uv run crucible create my_experiment --training
 ```
 
 Templates are file-based under `uiapp/templates/`, so you can customize scaffold output without editing CLI code.
@@ -126,7 +139,7 @@ This creates:
 You can overwrite existing scaffold files with:
 
 ```bash
-uv run crucible create my_experiment --job-type standalone --force
+uv run crucible create my_experiment --standalone --force
 ```
 
 Manual setup is still supported.

@@ -2,7 +2,7 @@ from abc import ABCMeta, abstractmethod
 from datetime import datetime
 from dotenv import load_dotenv
 
-from core.helpers.logger import _configure_logging
+from core.helpers.logger import configure_logging
 
 load_dotenv()
 
@@ -13,7 +13,7 @@ class AbstractJob(metaclass=ABCMeta):
 	def __init__(self, config) -> None:
 		self.config = config
 		self._job_id = self._build_job_id()
-		_configure_logging(config, self._job_id)
+		configure_logging(config, self._job_id)
 
 	@staticmethod
 	def _build_job_id() -> str:
