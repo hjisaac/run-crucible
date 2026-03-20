@@ -1,6 +1,6 @@
 from abc import abstractmethod
 
-from core.jobs.standalone import AbstractJob
+from core.jobs.abstract import AbstractJob
 from core.mixins.sgd import GradientDescentMixin
 
 

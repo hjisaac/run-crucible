@@ -61,7 +61,7 @@ Backward-compatible direct run commands (for example `uv run crucible mlp`) are 
 You can also run via module:
 
 ```bash
-uv run python -m uiapp
+uv run python -m interface.cli
 ```
 
 ## How It Works
@@ -78,12 +78,29 @@ uv run python -m uiapp
 ```text
 core/
 	jobs/            # Abstract job interfaces
-	datasets/        # Dataset modules (MNIST, CIFAR10, ...)
-	models/          # Model modules (MLP, ResNet, ...)
-	optimizers/      # Optimizer implementations
-	losses/          # Loss function modules
-	lr_schedulers/   # LR scheduler modules
-	helpers/         # Logging and tracking helpers
+		abstract.py
+		standalone.py
+		training.py
+	runtime/         # Run discovery and execution orchestration
+		discovery.py
+		execution.py
+		context.py
+	config/          # Config loading and override utilities
+		loader.py
+		overrides.py
+	handlers/        # Runtime handlers (logging, I/O, etc.)
+		logger.py
+	trackers/        # Experiment tracker interfaces and implementations
+		abstract.py
+		wandb.py
+
+plugins/
+	ml/              # Optional ML plugin modules
+		datasets/
+		models/
+		losses/
+		optimizers/
+		schedulers/
 
 runs/
 	mlp/             # Example run package
@@ -91,13 +108,15 @@ runs/
 		runner.py
 		configs/
 			default.yaml
+		outputs/
 
-uiapp/
-	cli.py           # Typer app entrypoint
-	utils.py         # Run/config discovery and execution helpers
+interface/
+	cli/
+		cli.py          # Typer app entrypoint
+		utils.py        # CLI scaffolding and template helpers
 
 tests/
-	test_uiapp_pipeline.py
+	test_interface_cli_pipeline.py
 ```
 
 ## Create a New Run
@@ -114,7 +133,7 @@ Or scaffold a training job:
 uv run crucible create my_experiment --job-type training
 ```
 
-Templates are file-based under `uiapp/templates/`, so you can customize scaffold output without editing CLI code.
+Templates are file-based under `interface/cli/templates/`, so you can customize scaffold output without editing CLI code.
 
 This creates:
 
@@ -122,6 +141,7 @@ This creates:
 - `runs/my_experiment/runner.py`
 - `runs/my_experiment/README.md`
 - `runs/my_experiment/configs/default.yaml`
+- `runs/my_experiment/outputs/`
 
 You can overwrite existing scaffold files with:
 
@@ -173,4 +193,4 @@ uv run pytest
 ## Notes
 
 - Runtime logging settings are read from config keys like `log_dir`, `log_console_level`, and `log_file_level`.
-- The project includes a Weights & Biases tracker abstraction in `core/helpers/tracker.py` for experiment tracking integration.
+- The project includes a Weights & Biases tracker abstraction in `core/trackers/wandb.py` for experiment tracking integration.

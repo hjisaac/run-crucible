@@ -10,8 +10,9 @@ import pytest
 from typer import Typer
 from typer.testing import CliRunner
 
-import uiapp.cli as ui_cli
-import uiapp.utils as ui_utils
+import interface.cli.cli as ui_cli
+import interface.cli.utils as ui_utils
+from core.runtime import context as runtime_context
 from omegaconf import OmegaConf
 
 
@@ -82,6 +83,7 @@ def _assert_generated_package_is_valid(created: Path) -> None:
 def demo_run_environment(tmp_path: Path, monkeypatch: pytest.MonkeyPatch) -> Path:
 	runs_root = _write_demo_run_package(tmp_path)
 	monkeypatch.syspath_prepend(str(tmp_path))
+	monkeypatch.setattr(runtime_context, "RUNS_ROOT", runs_root)
 	monkeypatch.setattr(ui_utils, "RUNS_ROOT", runs_root)
 	_clear_runs_modules()
 	return tmp_path
@@ -90,7 +92,7 @@ def demo_run_environment(tmp_path: Path, monkeypatch: pytest.MonkeyPatch) -> Pat
 def test_run_named_job_loads_config_applies_overrides_and_logs(demo_run_environment: Path, caplog) -> None:
 	tmp_path = demo_run_environment
 
-	with caplog.at_level(logging.WARNING, logger="uiapp.utils"):
+	with caplog.at_level(logging.WARNING, logger="core.runtime.execution"):
 		result = ui_utils.run_named_job("demo", "default", overrides=["message=overridden"])
 
 	assert result == {
@@ -109,7 +111,7 @@ def test_cli_command_runs_temp_pipeline_with_config_and_override(demo_run_enviro
 	app.command(name="demo")(ui_cli._build_run_command("demo"))
 
 	runner = CliRunner()
-	result = runner.invoke(app, ["demo", "--config", "default", "-o", "message=from_cli"])
+	result = runner.invoke(app, ["--config", "default", "-o", "message=from_cli"])
 
 	assert result.exit_code == 0
 	assert "from_cli" in result.output
@@ -118,7 +120,7 @@ def test_cli_command_runs_temp_pipeline_with_config_and_override(demo_run_enviro
 
 def test_list_available_runs_reads_temp_runs_folder(tmp_path, monkeypatch) -> None:
 	runs_root = _write_demo_run_package(tmp_path)
-	monkeypatch.setattr(ui_utils, "RUNS_ROOT", runs_root)
+	monkeypatch.setattr(runtime_context, "RUNS_ROOT", runs_root)
 
 	assert ui_utils.list_available_runs() == ["demo"]
 

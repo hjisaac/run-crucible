@@ -3,7 +3,7 @@ requires = ["setuptools>=68", "wheel"]
 build-backend = "setuptools.build_meta"
 
 [project]
-name = "ml-research"
+name = "crucible"
 version = "0.1.0"
 description = "Add your description here"
 readme = "README.md"
@@ -18,7 +18,7 @@ dependencies = [
 ]
 
 [project.scripts]
-crucible = "uiapp.cli:main"
+crucible = "interface.cli:main"
 
 [dependency-groups]
 dev = [
@@ -29,7 +29,7 @@ dev = [
 package = true
 
 [tool.setuptools.packages.find]
-include = ["core*", "uiapp*", "runs*"]
+include = ["core*", "interface*", "plugins*", "runs*"]
 
 [tool.setuptools.package-data]
-uiapp = ["templates/*.tpl"]
+"interface.cli" = ["templates/*.tpl"]
