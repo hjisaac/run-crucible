@@ -5,9 +5,9 @@ from pathlib import Path
 
 import pytest
 
-import uiapp.utils as ui_utils
+import interface.cli.utils as ui_utils
 
-REAL_TEMPLATES_DIR = Path(__file__).resolve().parents[1] / "uiapp" / "templates"
+REAL_TEMPLATES_DIR = Path(__file__).resolve().parents[1] / "interface" / "cli" / "templates"
 FIXTURES_DIR = Path(__file__).resolve().parent / "fixtures" / "templates"
 
 SAMPLE_RUN_NAME = "test_run"
