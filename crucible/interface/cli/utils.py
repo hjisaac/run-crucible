@@ -6,7 +6,7 @@ from pathlib import Path
 
 from omegaconf import OmegaConf
 
-from core.runtime.context import RUNS_ROOT
+from core.constants import RUNS_ROOT
 from core.runtime.discovery import list_available_runs
 from core.runtime.execution import run_named_job
 

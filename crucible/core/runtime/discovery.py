@@ -5,14 +5,14 @@ import inspect
 from typing import Any
 
 from core.jobs import AbstractJob
-from core.runtime import context
+from core.constants import RUNS_ROOT
 
 
 def list_available_runs() -> list[str]:
     """Return discovered run package names under runs/."""
     return sorted(
         path.name
-        for path in context.RUNS_ROOT.iterdir()
+        for path in RUNS_ROOT.iterdir()
         if path.is_dir() and (path / "__init__.py").exists()
     )
 
