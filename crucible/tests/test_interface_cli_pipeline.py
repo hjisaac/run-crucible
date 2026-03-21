@@ -123,7 +123,11 @@ def test_cli_command_runs_temp_pipeline_with_config_and_override(demo_run_enviro
 
 def test_list_available_runs_reads_temp_runs_folder(tmp_path, monkeypatch) -> None:
 	runs_root = _write_demo_run_package(tmp_path)
-	monkeypatch.setattr(runtime_context, "RUNS_ROOT", runs_root)
+	import core.constants
+	import core.runtime.discovery
+	monkeypatch.setattr(core.constants, "RUNS_ROOT", runs_root)
+	monkeypatch.setattr(ui_utils, "RUNS_ROOT", runs_root)
+	monkeypatch.setattr(core.runtime.discovery, "RUNS_ROOT", runs_root)
 
 	assert ui_utils.list_available_runs() == ["demo"]
 

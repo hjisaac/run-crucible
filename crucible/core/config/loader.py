@@ -3,13 +3,8 @@ from __future__ import annotations
 from pathlib import Path
 from typing import Any
 
-
-
 from hydra import compose, initialize_config_dir
 from omegaconf import OmegaConf, OmegaConf
-
-# Constant for the root config filename
-ROOT_CONFIG_FILENAME = "root.config.yaml"
 
 from core.config.overrides import sanitize_overrides
 from core.constants import RUNS_ROOT, SUPPORTED_CONFIG_EXTENSIONS, ROOT_CONFIG_FILENAME
