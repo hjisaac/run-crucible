@@ -18,7 +18,7 @@ def _normalize_run_name(run_name: str) -> str:
 	normalized = run_name.strip().lower()
 	if not normalized:
 		raise ValueError("Run name cannot be empty.")
-	if normalized in {"list", "run", "create"}:
+	if normalized in {"list", "run", "create", "web"}:
 		raise ValueError(f"Run name '{normalized}' is reserved by the CLI.")
 	if not RUN_NAME_PATTERN.match(normalized):
 		raise ValueError(

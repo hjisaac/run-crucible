@@ -114,5 +114,26 @@ def create_run(
 	_create_run(run_name, job_type=job_type, force=force)
 
 
+@app.command("web")
+def serve_web(
+	host: str = typer.Option("127.0.0.1", "--host", help="Bind host."),
+	port: int = typer.Option(8000, "--port", help="Bind port."),
+	reload: bool = typer.Option(False, "--reload", help="Enable auto-reload (development)."),
+) -> None:
+	"""Start the Crucible web interface."""
+	try:
+		import uvicorn
+	except ImportError as exc:
+		raise typer.BadParameter("uvicorn is required: pip install uvicorn") from exc
+
+	typer.echo(f"Starting Crucible web interface at http://{host}:{port}")
+	uvicorn.run(
+		"interface.web.server:app",
+		host=host,
+		port=port,
+		reload=reload,
+	)
+
+
 def main() -> None:
 	app()
