@@ -35,4 +35,4 @@ include = ["core*", "interface*", "plugins*", "runs*"]
 
 [tool.setuptools.package-data]
 "interface.cli" = ["templates/*.tpl"]
-"interface.web" = ["static/*"]
+"interface.web" = ["frontend/out/**/*"]

@@ -22,3 +22,7 @@ wandb/
 .env
 .env.*
 !.env.example
+
+# Next.js / Node
+interface/web/frontend/node_modules/
+interface/web/frontend/.next/
