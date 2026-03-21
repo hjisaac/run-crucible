@@ -6,8 +6,8 @@ from typing import Any
 
 from omegaconf import OmegaConf
 
-from core.config.loader import load_run_config
-from core.runtime.discovery import resolve_job_class
+from crucible.core.config.loader import load_run_config
+from crucible.core.runtime.discovery import resolve_job_class
 
 logger = logging.getLogger(__name__)
 

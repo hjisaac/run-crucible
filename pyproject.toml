@@ -18,7 +18,7 @@ dependencies = [
 ]
 
 [project.scripts]
-crucible = "interface.cli:main"
+crucible = "crucible.interface.cli:main"
 
 [dependency-groups]
 dev = [
@@ -29,7 +29,7 @@ dev = [
 package = true
 
 [tool.setuptools.packages.find]
-include = ["core*", "interface*", "plugins*", "runs*"]
+include = ["crucible*", "core*", "interface*", "plugins*", "runs*"]
 
 [tool.setuptools.package-data]
 "interface.cli" = ["templates/*.tpl"]

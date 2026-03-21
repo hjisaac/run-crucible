@@ -1,5 +1,5 @@
-from core.jobs.abstract import AbstractJob
-from core.jobs.standalone import AbstractStandaloneJob
-from core.jobs.training import AbstractGDTrainerJob, AbstractTrainerJob
+from crucible.core.jobs.abstract import AbstractJob
+from crucible.core.jobs.standalone import AbstractStandaloneJob
+from crucible.core.jobs.training import AbstractGDTrainerJob, AbstractTrainerJob
 
 __all__ = ["AbstractJob", "AbstractStandaloneJob", "AbstractTrainerJob", "AbstractGDTrainerJob"]

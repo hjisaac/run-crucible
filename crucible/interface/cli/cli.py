@@ -5,7 +5,7 @@ from typing import Any
 
 import typer
 
-from interface.cli.utils import create_run_package, list_available_runs, run_named_job
+from crucible.interface.cli.utils import create_run_package, list_available_runs, run_named_job
 
 
 class JobType(str, Enum):

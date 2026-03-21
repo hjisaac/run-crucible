@@ -12,7 +12,7 @@ from typer.testing import CliRunner
 
 import interface.cli.cli as ui_cli
 import interface.cli.utils as ui_utils
-from core.constants import RUNS_ROOT
+from crucible.core.constants import RUNS_ROOT
 from omegaconf import OmegaConf
 
 
@@ -24,7 +24,7 @@ def _clear_runs_modules() -> None:
 
 __RUNNER_SOURCE = dedent(
 	"""
-	from core.jobs import AbstractJob
+	from crucible.core.jobs import AbstractJob
 
 	class Job(AbstractJob):
 	    def setup_data(self) -> None:

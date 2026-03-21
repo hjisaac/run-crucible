@@ -24,13 +24,13 @@ def test_subconfig_overrides_root(monkeypatch):
         root_config = tmp / loader.ROOT_CONFIG_FILENAME
         root_config.write_text(_ROOT_CONFIG_YAML)
         # Write run config
-        run_dir = tmp / "my_runs" / "exp1" / "configs"
+        run_dir = tmp / constants.RUNS_ROOT_NAME / "exp1" / "configs"
         run_dir.mkdir(parents=True)
         sub_config = run_dir / "default.yaml"
         sub_config.write_text(_SUBCONFIG_OVERRIDE_YAML)
         # Patch loader and constants to use this workspace
-        monkeypatch.setattr(constants, "RUNS_ROOT", tmp / "my_runs")
-        monkeypatch.setattr(loader, "RUNS_ROOT", tmp / "my_runs")
+        monkeypatch.setattr(constants, "RUNS_ROOT", tmp / constants.RUNS_ROOT_NAME)
+        monkeypatch.setattr(loader, "RUNS_ROOT", tmp / constants.RUNS_ROOT_NAME)
         # Patch __file__ to simulate loader location
         monkeypatch.setattr("crucible.core.config.loader.__file__", str(tmp / "crucible" / "core" / "config" / "loader.py"))
         monkeypatch.setattr(loader, "ROOT_CONFIG_FILENAME", root_config.name)
@@ -46,13 +46,13 @@ def test_root_config_used_if_subconfig_missing(monkeypatch):
         root_config = tmp / loader.ROOT_CONFIG_FILENAME
         root_config.write_text(_ROOT_CONFIG_YAML)
         # Write run config (no log_level)
-        run_dir = tmp / "my_runs" / "exp2" / "configs"
+        run_dir = tmp / constants.RUNS_ROOT_NAME / "exp2" / "configs"
         run_dir.mkdir(parents=True)
         sub_config = run_dir / "default.yaml"
         sub_config.write_text(_SUBCONFIG_OVERRIDE_YAML)
         # Patch loader and constants to use this workspace
-        monkeypatch.setattr(constants, "RUNS_ROOT", tmp / "my_runs")
-        monkeypatch.setattr(loader, "RUNS_ROOT", tmp / "my_runs")
+        monkeypatch.setattr(constants, "RUNS_ROOT", tmp / constants.RUNS_ROOT_NAME)
+        monkeypatch.setattr(loader, "RUNS_ROOT", tmp / constants.RUNS_ROOT_NAME)
         # Patch __file__ to simulate loader location
         monkeypatch.setattr("crucible.core.config.loader.__file__", str(tmp / "crucible" / "core" / "config" / "loader.py"))
         monkeypatch.setattr(loader, "ROOT_CONFIG_FILENAME", root_config.name)

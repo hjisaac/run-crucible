@@ -6,8 +6,8 @@ from typing import Any
 from hydra import compose, initialize_config_dir
 from omegaconf import OmegaConf, OmegaConf
 
-from core.config.overrides import sanitize_overrides
-from core.constants import RUNS_ROOT, SUPPORTED_CONFIG_EXTENSIONS, ROOT_CONFIG_FILENAME
+from crucible.core.config.overrides import sanitize_overrides
+from crucible.core.constants import RUNS_ROOT, SUPPORTED_CONFIG_EXTENSIONS, ROOT_CONFIG_FILENAME
 
 
 def _resolve_config_path(run_name: str, config_name: str) -> tuple[Path, str, Path]:
@@ -42,7 +42,8 @@ def load_run_config(
     config_name: str,
     overrides: list[str] | None = None,
 ) -> tuple[dict[str, Any], Path, list[str]]:
-    """Load a run config from my_runs/<name>/configs, merging with root.config.yaml. Subconfig values override root config."""
+    """Load a run config from the runs root (default: my_runs)/<name>/configs, merging with root.config.yaml.
+    Subconfig values override root config."""
     normalized_run_name = run_name.strip().lower()
     config_dir, config_stem, config_path = _resolve_config_path(normalized_run_name, config_name)
     resolved_overrides = sanitize_overrides(overrides)

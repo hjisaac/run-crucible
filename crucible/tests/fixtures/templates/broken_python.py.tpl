@@ -1,4 +1,4 @@
-from core.jobs import AbstractJob
+from crucible.core.jobs import AbstractJob
 
 
 class Job(AbstractJob)

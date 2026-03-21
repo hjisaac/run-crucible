@@ -1,7 +1,7 @@
 from abc import abstractmethod
 
-from core.jobs.abstract import AbstractJob
-from core.mixins.sgd import GradientDescentMixin
+from crucible.core.jobs.abstract import AbstractJob
+from crucible.core.mixins.sgd import GradientDescentMixin
 
 
 class AbstractTrainerJob(AbstractJob):

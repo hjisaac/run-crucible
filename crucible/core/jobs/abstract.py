@@ -3,7 +3,7 @@ from datetime import datetime
 
 from dotenv import load_dotenv
 
-from core.handlers.logger import configure_logging
+from crucible.core.handlers.logger import configure_logging
 
 load_dotenv()
 

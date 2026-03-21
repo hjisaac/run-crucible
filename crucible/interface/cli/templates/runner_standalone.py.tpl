@@ -9,7 +9,7 @@ if __package__ is None or __package__ == "":
 	# Supports direct execution: python runs/{run_name}/runner.py
 	sys.path.insert(0, str(Path(__file__).resolve().parents[2]))
 
-from core.jobs import AbstractJob
+from crucible.core.jobs import AbstractJob
 
 
 logger = logging.getLogger(__name__)

@@ -4,7 +4,7 @@ from typing import Any
 
 import wandb
 
-from core.trackers.abstract import AbstractTracker
+from .abstract import AbstractTracker
 
 
 class WBTracker(AbstractTracker):

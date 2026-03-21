@@ -128,7 +128,7 @@ Add a package under `runs/`, for example `runs/my_experiment/`:
 Minimal pattern:
 
 ```python
-from core.jobs import AbstractJob
+from crucible.core.jobs import AbstractJob
 
 
 class Job(AbstractJob):

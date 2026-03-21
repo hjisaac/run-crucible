@@ -4,8 +4,8 @@ import importlib
 import inspect
 from typing import Any
 
-from core.jobs import AbstractJob
-from core.constants import RUNS_ROOT
+from crucible.core.jobs import AbstractJob
+from crucible.core.constants import RUNS_ROOT
 
 
 def list_available_runs() -> list[str]:

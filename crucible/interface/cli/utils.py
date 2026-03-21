@@ -6,9 +6,9 @@ from pathlib import Path
 
 from omegaconf import OmegaConf
 
-from core.constants import RUNS_ROOT
-from core.runtime.discovery import list_available_runs
-from core.runtime.execution import run_named_job
+from crucible.core.constants import RUNS_ROOT
+from crucible.core.runtime.discovery import list_available_runs
+from crucible.core.runtime.execution import run_named_job
 
 TEMPLATES_DIR = Path(__file__).resolve().parent / "templates"
 RUN_NAME_PATTERN = re.compile(r"^[a-z][a-z0-9_]*$")
@@ -55,6 +55,9 @@ def _validate_rendered_template(template_name: str, rendered_content: str) -> No
 
 def create_run_package(run_name: str, *, standalone: bool = True, force: bool = False) -> Path:
 	run_name = _normalize_run_name(run_name)
+	# Ensure the runs root directory exists (create if missing)
+	if not RUNS_ROOT.exists():
+		RUNS_ROOT.mkdir(parents=True, exist_ok=True)
 	run_dir = RUNS_ROOT / run_name
 
 	if run_dir.exists() and not force:
