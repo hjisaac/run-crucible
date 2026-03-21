@@ -10,9 +10,13 @@ import pytest
 from typer import Typer
 from typer.testing import CliRunner
 
-import interface.cli.cli as ui_cli
-import interface.cli.utils as ui_utils
+import crucible.interface.cli.cli as ui_cli
+import crucible.interface.cli.utils as ui_utils
 from crucible.core.constants import RUNS_ROOT
+from crucible.core import constants
+from crucible.core.config import loader
+from crucible.core.runtime import discovery
+
 from omegaconf import OmegaConf
 
 
@@ -83,8 +87,6 @@ def _assert_generated_package_is_valid(created: Path) -> None:
 def demo_run_environment(tmp_path: Path, monkeypatch: pytest.MonkeyPatch) -> Path:
 	runs_root = _write_demo_run_package(tmp_path)
 	monkeypatch.syspath_prepend(str(tmp_path))
-	import core.constants
-	import core.config.loader
 	monkeypatch.setattr(core.constants, "RUNS_ROOT", runs_root)
 	monkeypatch.setattr(core.config.loader, "RUNS_ROOT", runs_root)
 	monkeypatch.setattr(ui_utils, "RUNS_ROOT", runs_root)
@@ -123,9 +125,7 @@ def test_cli_command_runs_temp_pipeline_with_config_and_override(demo_run_enviro
 
 def test_list_available_runs_reads_temp_runs_folder(tmp_path, monkeypatch) -> None:
 	runs_root = _write_demo_run_package(tmp_path)
-	import core.constants
-	import core.runtime.discovery
-	monkeypatch.setattr(core.constants, "RUNS_ROOT", runs_root)
+	monkeypatch.setattr(constants, "RUNS_ROOT", runs_root)
 	monkeypatch.setattr(ui_utils, "RUNS_ROOT", runs_root)
 	monkeypatch.setattr(core.runtime.discovery, "RUNS_ROOT", runs_root)
 

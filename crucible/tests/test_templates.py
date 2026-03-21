@@ -5,7 +5,7 @@ from pathlib import Path
 
 import pytest
 
-import interface.cli.utils as ui_utils
+import crucible.interface.cli.utils as ui_utils
 
 REAL_TEMPLATES_DIR = Path(__file__).resolve().parents[1] / "interface" / "cli" / "templates"
 FIXTURES_DIR = Path(__file__).resolve().parent / "fixtures" / "templates"
