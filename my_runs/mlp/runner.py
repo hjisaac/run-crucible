@@ -31,7 +31,7 @@ class Job(AbstractJob):
 		self.train_dataset = datasets.MNIST(
 			root="/tmp/mnist-data", train=True, download=True, transform=transform
 		)
-		self.test_dataset = datasets.MNIST(
+		self.valid_dataset = datasets.MNIST(
 			root="/tmp/mnist-data", train=False, download=True, transform=transform
 		)
 
@@ -59,7 +59,7 @@ class Job(AbstractJob):
 
 		# Evaluate
 		model.eval()
-		test_loader = DataLoader(self.test_dataset, batch_size=256)
+		test_loader = DataLoader(self.valid_dataset, batch_size=256)
 		correct = 0
 		total = 0
 		with torch.no_grad():

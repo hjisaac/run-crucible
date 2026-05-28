@@ -1,14 +1,14 @@
 from __future__ import annotations
 
+import sys
 from pathlib import Path
 from typing import Any
 
 from hydra import compose, initialize_config_dir
-from omegaconf import OmegaConf, OmegaConf
+from omegaconf import OmegaConf
 
 from crucible.core.config.overrides import sanitize_overrides
 from crucible.core.constants import RUNS_ROOT, SUPPORTED_CONFIG_EXTENSIONS, ROOT_CONFIG_FILENAME
-
 
 def _resolve_config_path(run_name: str, config_name: str) -> tuple[Path, str, Path]:
     run_dir = RUNS_ROOT / run_name
