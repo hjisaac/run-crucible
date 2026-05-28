@@ -104,11 +104,11 @@ Templates are file-based under `interface/cli/templates/`, so you can customize 
 
 This creates:
 
-- `runs/my_experiment/__init__.py`
-- `runs/my_experiment/runner.py`
-- `runs/my_experiment/README.md`
-- `runs/my_experiment/configs/default.yaml`
-- `runs/my_experiment/outputs/`
+- `my_runs/my_experiment/__init__.py`
+- `my_runs/my_experiment/runner.py`
+- `my_runs/my_experiment/README.md`
+- `my_runs/my_experiment/configs/default.yaml`
+- `my_runs/my_experiment/outputs/`
 
 You can overwrite existing scaffold files with:
 
@@ -118,12 +118,12 @@ uv run crucible create my_experiment --job-type standalone --force
 
 Manual setup is still supported.
 
-Add a package under `runs/`, for example `runs/my_experiment/`:
+Add a package under `runs/`, for example `my_runs/my_experiment/`:
 
-1. Create `runs/my_experiment/__init__.py`
-2. Create `runs/my_experiment/runner.py` with a concrete `AbstractJob` subclass
+1. Create `my_runs/my_experiment/__init__.py`
+2. Create `my_runs/my_experiment/runner.py` with a concrete `AbstractJob` subclass
 3. Export `Job` or `JOB_CLASS` from `__init__.py`
-4. Add `runs/my_experiment/configs/default.yaml`
+4. Add `my_runs/my_experiment/configs/default.yaml`
 
 Minimal pattern:
 
