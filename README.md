@@ -5,7 +5,7 @@ Composable Python job runner with dynamic job discovery, Hydra config overrides,
 ## What This Project Is
 
 
-`Crucible` is a lightweight framework for organizing and running modular "runs" under the `my_runs/` directory (formerly `runs/`).
+`Crucible` is a lightweight framework for organizing and running experiments under the `my_runs/` directory.
 
 
 ## How to Create and Use Runs
