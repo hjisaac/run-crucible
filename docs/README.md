@@ -1,6 +1,8 @@
 # RunCrucible
 
-Composable Python job runner with dynamic job discovery, Hydra config overrides, and a Typer CLI.
+From paper or idea to runnable experiment with minimal friction — a composable Python job runner with dynamic job discovery, Hydra config overrides, and a Typer CLI.
+
+I designed RunCrucible to speed up how I explore ML: testing research ideas, trying methods from a paper, or learning a technique — a robust, low-effort path from sketch to runnable job.
 
 ## Vocabulary
 

@@ -5,7 +5,7 @@ build-backend = "setuptools.build_meta"
 [project]
 name = "crucible"
 version = "0.1.0"
-description = "RunCrucible — composable Python job runner with dynamic discovery and lifecycle hooks"
+description = "From paper or idea to runnable experiment with minimal friction."
 readme = "README.md"
 requires-python = ">=3.13"
 dependencies = [
