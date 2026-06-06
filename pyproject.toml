@@ -47,7 +47,7 @@ dev = [
 package = true
 
 [tool.setuptools.packages.find]
-include = ["crucible*", "core*", "interface*", "plugins*", "runs*"]
+include = ["crucible*", "jobs*"]
 
 [tool.setuptools.package-data]
 "interface.cli" = ["templates/*.tpl"]

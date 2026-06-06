@@ -7,7 +7,7 @@ class Job(AbstractJob)
 
 	def run(self) -> dict[str, str]:
 		self.setup()
-		return {{"status": "ok", "task": "{run_name}"}}
+		return {{"status": "ok", "job": "{job_name}"}}
 
 
 JOB_CLASS = Job

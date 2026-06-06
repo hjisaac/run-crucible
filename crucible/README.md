@@ -10,7 +10,7 @@ This document describes the internal structure of the `crucible/` folder, which 
 
 ### core/
 - `jobs/` — Abstract job interfaces and base classes
-- `runtime/` — Run discovery, execution, and context management
+- `runtime/` — Job discovery, run execution, and context management
 - `config/` — Config loading and override logic
 - `handlers/` — Logging and output handlers
 - `trackers/` — Experiment tracking (e.g., Weights & Biases)
@@ -23,7 +23,7 @@ This document describes the internal structure of the `crucible/` folder, which 
 ### interface/cli/
 - `cli.py` — Typer CLI entrypoint
 - `utils.py` — CLI helpers
-- `templates/` — Code generation templates for new runs
+- `templates/` — Code generation templates for new jobs
 
 ### tests/
 - Framework and CLI tests

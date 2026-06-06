@@ -6,23 +6,29 @@ from pathlib import Path
 
 from omegaconf import OmegaConf
 
-from crucible.core.constants import RUNS_ROOT
-from crucible.core.runtime.discovery import list_available_runs
+from crucible.core.constants import JOBS_ROOT
+from crucible.core.runtime.discovery import list_available_jobs
 from crucible.core.runtime.execution import run_named_job
 
 TEMPLATES_DIR = Path(__file__).resolve().parent / "templates"
-RUN_NAME_PATTERN = re.compile(r"^[a-z][a-z0-9_]*$")
+JOB_NAME_PATTERN = re.compile(r"^[a-z][a-z0-9_]*$")
+
+# Maps a scaffold kind to its job.py template.
+_KIND_TEMPLATES = {
+	"job": "job_plain.py.tpl",
+	"trainer": "job_trainer.py.tpl",
+}
 
 
-def _normalize_run_name(run_name: str) -> str:
-	normalized = run_name.strip().lower()
+def _normalize_job_name(job_name: str) -> str:
+	normalized = job_name.strip().lower()
 	if not normalized:
-		raise ValueError("Run name cannot be empty.")
+		raise ValueError("Job name cannot be empty.")
 	if normalized in {"list", "run", "create"}:
-		raise ValueError(f"Run name '{normalized}' is reserved by the CLI.")
-	if not RUN_NAME_PATTERN.match(normalized):
+		raise ValueError(f"Job name '{normalized}' is reserved by the CLI.")
+	if not JOB_NAME_PATTERN.match(normalized):
 		raise ValueError(
-			"Run name must match ^[a-z][a-z0-9_]*$ (lowercase letters, numbers, underscore)."
+			"Job name must match ^[a-z][a-z0-9_]*$ (lowercase letters, numbers, underscore)."
 		)
 	return normalized
 
@@ -53,24 +59,27 @@ def _validate_rendered_template(template_name: str, rendered_content: str) -> No
 		raise ValueError(f"Rendered template '{template_name}' is not valid YAML.") from exc
 
 
-def create_run_package(run_name: str, *, standalone: bool = True, force: bool = False) -> Path:
-	run_name = _normalize_run_name(run_name)
-	# Ensure the runs root directory exists (create if missing)
-	if not RUNS_ROOT.exists():
-		RUNS_ROOT.mkdir(parents=True, exist_ok=True)
-	run_dir = RUNS_ROOT / run_name
+def create_job_package(job_name: str, *, kind: str = "job", force: bool = False) -> Path:
+	if kind not in _KIND_TEMPLATES:
+		raise ValueError(f"Unknown job kind '{kind}'. Expected one of: {', '.join(_KIND_TEMPLATES)}.")
 
-	if run_dir.exists() and not force:
-		raise FileExistsError(f"Run folder already exists: {run_dir}")
+	job_name = _normalize_job_name(job_name)
+	# Ensure the jobs root directory exists (create if missing)
+	if not JOBS_ROOT.exists():
+		JOBS_ROOT.mkdir(parents=True, exist_ok=True)
+	job_dir = JOBS_ROOT / job_name
 
-	configs_dir = run_dir / "configs"
-	outputs_dir = run_dir / "outputs"
+	if job_dir.exists() and not force:
+		raise FileExistsError(f"Job folder already exists: {job_dir}")
+
+	configs_dir = job_dir / "configs"
+	outputs_dir = job_dir / "outputs"
 	configs_dir.mkdir(parents=True, exist_ok=True)
 	outputs_dir.mkdir(parents=True, exist_ok=True)
-	runner_template_name = "runner_standalone.py.tpl" if standalone else "runner_training.py.tpl"
-	runner_source = _render_template(runner_template_name, run_name=run_name)
+	job_template_name = _KIND_TEMPLATES[kind]
+	job_source = _render_template(job_template_name, job_name=job_name)
 
-	_validate_rendered_template(runner_template_name, runner_source)
+	_validate_rendered_template(job_template_name, job_source)
 
 	init_source = _render_template("__init__.py.tpl")
 	_validate_rendered_template("__init__.py.tpl", init_source)
@@ -78,13 +87,13 @@ def create_run_package(run_name: str, *, standalone: bool = True, force: bool = 
 	default_config_source = _render_template("default.yaml.tpl")
 	_validate_rendered_template("default.yaml.tpl", default_config_source)
 
-	_write_scaffold_file(run_dir / "__init__.py", init_source, force)
-	_write_scaffold_file(run_dir / "runner.py", runner_source, force)
-	_write_scaffold_file(run_dir / "README.md", "", force)
+	_write_scaffold_file(job_dir / "__init__.py", init_source, force)
+	_write_scaffold_file(job_dir / "job.py", job_source, force)
+	_write_scaffold_file(job_dir / "README.md", "", force)
 	_write_scaffold_file(
 		configs_dir / "default.yaml",
 		default_config_source,
 		force,
 	)
 
-	return run_dir
+	return job_dir

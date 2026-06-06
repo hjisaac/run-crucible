@@ -13,18 +13,18 @@ class AbstractJob(metaclass=ABCMeta):
 
 	def __init__(self, config) -> None:
 		self.config = config
-		self._job_id = self._build_job_id()
-		configure_logging(config, self._job_id)
+		self._run_id = self._build_run_id()
+		configure_logging(config, self._run_id)
 
 	@staticmethod
-	def _build_job_id() -> str:
+	def _build_run_id() -> str:
 		now = datetime.now()
 		return f"{now.strftime('%Y-%b-%d_%H-%M-%S')}-{now.microsecond // 1000:03d}"
 
 	@property
-	def job_id(self) -> str:
-		"""Unique identifier for this run, used for logging and tracking."""
-		return self._job_id
+	def run_id(self) -> str:
+		"""Unique identifier for a single run (execution) of this job, used for logging and tracking."""
+		return self._run_id
 
 	@abstractmethod
 	def setup_data(self) -> None:

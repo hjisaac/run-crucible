@@ -5,14 +5,14 @@ import inspect
 from typing import Any
 
 from crucible.core.jobs import AbstractJob
-from crucible.core.constants import RUNS_ROOT
+from crucible.core.constants import JOBS_ROOT
 
 
-def list_available_runs() -> list[str]:
-    """Return discovered run package names under runs/."""
+def list_available_jobs() -> list[str]:
+    """Return the names of job packages discovered under the jobs root."""
     return sorted(
         path.name
-        for path in RUNS_ROOT.iterdir()
+        for path in JOBS_ROOT.iterdir()
         if path.is_dir() and (path / "__init__.py").exists()
     )
 
@@ -33,13 +33,13 @@ def _resolve_job_class(module: Any) -> type[AbstractJob] | None:
     return None
 
 
-def resolve_job_class(run_name: str) -> type[AbstractJob]:
-    """Resolve a concrete job class from runs.<run_name>."""
-    normalized_run_name = run_name.strip().lower()
+def resolve_job_class(job_name: str) -> type[AbstractJob]:
+    """Resolve a concrete job class from jobs.<job_name>."""
+    normalized_job_name = job_name.strip().lower()
     try:
-        module = importlib.import_module(f"runs.{normalized_run_name}")
+        module = importlib.import_module(f"jobs.{normalized_job_name}")
     except ModuleNotFoundError as exc:
-        raise ValueError(f"Run '{normalized_run_name}' was not found.") from exc
+        raise ValueError(f"Job '{normalized_job_name}' was not found.") from exc
 
     resolved = _resolve_job_class(module)
     if resolved is not None:
@@ -54,6 +54,6 @@ def resolve_job_class(run_name: str) -> type[AbstractJob]:
             return candidate
 
     raise ValueError(
-        f"Run '{normalized_run_name}' does not expose a concrete job class. "
-        "Export Job or JOB_CLASS from runs/<run>/__init__.py."
+        f"Job '{normalized_job_name}' does not expose a concrete job class. "
+        "Export Job or JOB_CLASS from jobs/<job>/__init__.py."
     )

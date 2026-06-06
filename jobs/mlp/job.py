@@ -5,7 +5,7 @@ import sys
 from pathlib import Path
 
 if __package__ is None or __package__ == "":
-	# Supports direct execution: python runs/mlp/runner.py
+	# Supports direct execution: python jobs/mlp/job.py
 	sys.path.insert(0, str(Path(__file__).resolve().parents[2]))
 
 
