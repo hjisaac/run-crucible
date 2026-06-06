@@ -1,31 +1,31 @@
-# Crucible Framework Code Structure
+# RunCrucible — Framework Internals
 
-This document describes the internal structure of the `crucible/` folder, which contains all framework, plugin, and interface code for the run-crucible project. This is intended for contributors and advanced users interested in the internals.
+Contributor guide. Usage docs: [docs/README.md](../docs/README.md). User jobs live in `jobs/<name>/` (see `core/constants/JOBS_ROOT`).
 
-## crucible/
-- `core/` — Core abstractions, runtime, config, job interfaces, trackers, and utilities
-- `plugins/` — Optional ML modules (datasets, models, losses, optimizers, schedulers)
-- `interface/` — CLI entrypoint, CLI utilities, and code generation templates
-- `tests/` — Test suite for framework and CLI
+## Layout
 
-### core/
-- `jobs/` — Abstract job interfaces and base classes
-- `runtime/` — Run discovery, execution, and context management
-- `config/` — Config loading and override logic
-- `handlers/` — Logging and output handlers
-- `trackers/` — Experiment tracking (e.g., Weights & Biases)
-- `mixins/` — Optional mixins for job classes
-- `utils/` — Shared utility functions
+```text
+crucible/
+├── core/           # jobs, runtime, config, handlers, trackers, mixins, constants, utils
+├── plugins/ml/     # reusable ML modules (models, optimizers) — not jobs
+├── interface/cli/  # Typer CLI, scaffolding, templates
+└── tests/
+```
 
-### plugins/ml/
-- `datasets/`, `models/`, `losses/`, `optimizers/`, `schedulers/` — ML-specific modules
+## Runtime
 
-### interface/cli/
-- `cli.py` — Typer CLI entrypoint
-- `utils.py` — CLI helpers
-- `templates/` — Code generation templates for new runs
+`run_named_job()` → discover class → load config + overrides → `job.execute()`.
 
-### tests/
-- Framework and CLI tests
+## Job classes
 
-For details on how to use or extend the framework, see the main README or the relevant module docstrings.
+- `AbstractJob` — `on_prepare()`, `on_execute()`; `execute()` runs the full hook chain
+- `AbstractTrainerJob` — `on_prepare_data/model/metrics`, `on_train()`, `on_evaluate()`
+- `AbstractGDTrainerJob` — adds optimizer and LR scheduler setup
+
+Hooks: `on_start` → `on_prepare` → `on_track` → `on_execute` → `on_finalize` / `on_fail` → `on_teardown`
+
+## Testing
+
+```bash
+uv run pytest
+```

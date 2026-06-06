@@ -5,8 +5,8 @@ from typing import Any
 
 __RUN_FILE_PREFIX = "run_file:"
 
-def _get_run_file_handler_name(job_id: str) -> str:
-	return f"{__RUN_FILE_PREFIX}{job_id}"
+def _get_run_file_handler_name(run_id: str) -> str:
+	return f"{__RUN_FILE_PREFIX}{run_id}"
 
 def _get_logging_config(
 	console_level: str,
@@ -43,7 +43,7 @@ def _get_logging_config(
 	}
 
 
-def configure_logging(config: dict[str, Any], job_id: str) -> None:
+def configure_logging(config: dict[str, Any], run_id: str) -> None:
 	"""Configure the root logger with a console handler and a per-run file handler.
 
 	Any logging.getLogger(__name__) call anywhere in the codebase will
@@ -54,7 +54,7 @@ def configure_logging(config: dict[str, Any], job_id: str) -> None:
 
 	console_level = config.get("log_console_level", "INFO")
 	file_level = config.get("log_file_level", "DEBUG")
-	run_file_handler_name = _get_run_file_handler_name(job_id)
+	run_file_handler_name = _get_run_file_handler_name(run_id)
 
 	# Clean up any existing run_file: handler before reconfiguring
 	root = logging.getLogger()
@@ -68,7 +68,7 @@ def configure_logging(config: dict[str, Any], job_id: str) -> None:
 			console_level=console_level,
 			file_level=file_level,
 			file_handler_name=run_file_handler_name,
-			log_file=str(log_dir / f"{job_id}.log"),
+			log_file=str(log_dir / f"{run_id}.log"),
 		)
 	)
 

@@ -1,4 +1,5 @@
 from abc import abstractmethod
+from typing import Any
 
 from crucible.core.jobs.abstract import AbstractJob
 from crucible.core.mixins.sgd import GradientDescentMixin
@@ -10,37 +11,43 @@ class AbstractTrainerJob(AbstractJob):
 	def __init__(self, config) -> None:
 		super().__init__(config)
 
-	def setup(self) -> None:
-		super().setup()
-		self.setup_model()
-		self.setup_metrics()
-		self.setup_tracker()
+	def on_prepare(self) -> None:
+		self.on_prepare_data()
+		self.on_prepare_model()
+		self.on_prepare_metrics()
 
 	@abstractmethod
-	def setup_model(self) -> None:
+	def on_prepare_data(self) -> None:
 		pass
 
 	@abstractmethod
-	def setup_metrics(self) -> None:
+	def on_prepare_model(self) -> None:
 		pass
 
 	@abstractmethod
-	def train(self) -> None:
+	def on_prepare_metrics(self) -> None:
+		pass
+
+	def on_execute(self) -> Any:
+		train_result = self.on_train()
+		eval_result = self.on_evaluate()
+		if isinstance(train_result, dict) and isinstance(eval_result, dict):
+			return {**train_result, **eval_result}
+		return eval_result if eval_result is not None else train_result
+
+	@abstractmethod
+	def on_train(self) -> Any:
 		pass
 
 	@abstractmethod
-	def evaluate(self) -> None:
+	def on_evaluate(self) -> Any:
 		pass
-
-	def run(self):
-		self.setup()
-		return self.train()
 
 
 class AbstractGDTrainerJob(AbstractTrainerJob, GradientDescentMixin):
 	"""Trainer job that assumes gradient-descent-based optimization."""
 
-	def setup(self) -> None:
-		super().setup()
-		self.setup_optimizer()
-		self.setup_lr_scheduler()
+	def on_prepare(self) -> None:
+		super().on_prepare()
+		self.on_prepare_optimizer()
+		self.on_prepare_lr_scheduler()

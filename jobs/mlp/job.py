@@ -1,11 +1,9 @@
-from __future__ import annotations
-
 import logging
 import sys
 from pathlib import Path
 
 if __package__ is None or __package__ == "":
-	# Supports direct execution: python runs/mlp/runner.py
+	# Supports direct execution: python jobs/mlp/job.py
 	sys.path.insert(0, str(Path(__file__).resolve().parents[2]))
 
 
@@ -19,11 +17,10 @@ from crucible.plugins.ml.models.mlp import MLP
 logger = logging.getLogger(__name__)
 
 
-
 class Job(AbstractJob):
 	"""Train a simple MLP on MNIST."""
 
-	def setup_data(self) -> None:
+	def on_prepare(self) -> None:
 		transform = transforms.Compose([
 			transforms.ToTensor(),
 			transforms.Lambda(lambda x: x.view(-1))
@@ -35,8 +32,7 @@ class Job(AbstractJob):
 			root="/tmp/mnist-data", train=False, download=True, transform=transform
 		)
 
-	def run(self) -> dict[str, str]:
-		self.setup()
+	def on_execute(self) -> dict[str, str]:
 		device = torch.device("cuda" if torch.cuda.is_available() else "cpu")
 		model = MLP().to(device)
 		train_loader = DataLoader(self.train_dataset, batch_size=64, shuffle=True)
@@ -57,7 +53,6 @@ class Job(AbstractJob):
 			avg_loss = total_loss / len(train_loader)
 			logger.info(f"Epoch {epoch}: avg loss = {avg_loss:.4f}")
 
-		# Evaluate
 		model.eval()
 		test_loader = DataLoader(self.valid_dataset, batch_size=256)
 		correct = 0

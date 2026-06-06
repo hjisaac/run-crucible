@@ -1,157 +1,91 @@
-# Crucible
+# RunCrucible
 
-Composable Python job runner with dynamic job discovery, Hydra config overrides, and a Typer CLI.
+From paper or idea to runnable experiment with minimal friction — a composable Python job runner with dynamic job discovery, Hydra config overrides, and a Typer CLI.
 
-## What This Project Is
+I designed RunCrucible to speed up how I explore AI/ML: testing research ideas, trying methods from a paper, or learning a technique — a robust, low-effort path from sketch to runnable job.
 
+## Vocabulary
 
-`Crucible` is a lightweight framework for organizing and running experiments under the `my_runs/` directory.
+RunCrucible uses three words, each with exactly one meaning:
 
+- **Job** — the unit of work you author: a Python package under `jobs/<name>/` containing a `Job` class.
+- **Run** — a single execution of a job. Each run gets a unique `run_id` and its own log file.
+- **`run`** (the CLI verb) — start a run of a job.
 
-## How to Create and Use Runs
+Reusable ML building blocks (models, optimizers, schedulers) live in `crucible/plugins/ml/` and are never jobs themselves.
 
-All user experiments and jobs live in the `my_runs/` folder. Each run is a Python package with:
-
-- A concrete job class (`Job` or `JOB_CLASS`) derived from `AbstractJob` (see example below)
-- A `configs/` folder with YAML configs (e.g., `default.yaml`)
-- Optional run-specific logic, models, and training behavior
-
-The CLI auto-discovers available runs in `my_runs/` and executes them with config and override support.
-
-
-## Highlights
-
-- Dynamic run discovery from `my_runs/<name>/`
-- Typer-based CLI via `crucible`
-- Hydra-powered config loading and runtime overrides
-- Per-run logging to console and file
-- Base abstractions for standalone and training jobs
-- Test coverage for CLI + pipeline wiring
-
-## Requirements
-
-- Python 3.13+
-- uv
-
-## Installation
-
-Install dependencies and the project environment with uv.
+## Quick Start
 
 ```bash
 uv sync
-```
-
-## CLI Usage
-
-List available runs:
-
-```bash
 uv run crucible list
-```
-
-Run a discovered job (example: `mlp`):
-
-```bash
 uv run crucible run mlp
 ```
 
-Run with config and Hydra-style overrides:
+Requires Python 3.10+. [uv](https://docs.astral.sh/uv/) is recommended for install and runs.
+
+## CLI
 
 ```bash
-uv run crucible run mlp --config default -o log_console_level=DEBUG -o log_dir=logs/dev
+uv run crucible list
+uv run crucible run <job> --config default -o log_console_level=DEBUG
+uv run crucible create <name> --kind job      # plain job
+uv run crucible create <name> --kind trainer  # trainer scaffold
+uv run crucible create <name> --kind job --force
 ```
 
-Backward-compatible direct run commands (for example `uv run crucible mlp`) are still supported.
+Direct commands (e.g. `uv run crucible mlp`) are still supported.
 
-You can also run via module:
+## Job Lifecycle Hooks
 
-```bash
-uv run python -m interface.cli
+The runtime calls `job.execute()`. Each run follows a fixed hook order:
+
+```text
+execute()
+  ├─ on_start()        # optional — banners, config validation
+  ├─ on_prepare()      # required — build state on self (data, paths, clients)
+  ├─ on_track()        # optional — attach self.tracker
+  ├─ try:
+  │    result = on_execute()   # required — main work; return a small result dict
+  │    on_finalize(result)     # optional — save artifacts, log summaries
+  ├─ except:
+  │    on_fail(exc)            # optional — react to errors
+  └─ finally:
+       on_teardown()           # always — close tracker, release resources
 ```
 
+**Data flow:** read from `self.config` during prepare; write runtime state on `self`; return a serializable `result` from `on_execute()`.
 
-## How It Works
+**Plain job** — implement `on_prepare()` and `on_execute()`.
 
-1. The CLI scans `my_runs/` for package folders containing `__init__.py`.
-2. For each discovered run, it registers a command with the same name.
-3. At runtime, it resolves `JOB_CLASS` or `Job` from `my_runs.<run_name>`.
-4. It loads `my_runs/<run_name>/configs/<config>.yaml` using Hydra.
-5. Overrides passed by `-o/--override` are applied.
-6. The job is instantiated and executed.
+**Trainer job** (`AbstractTrainerJob`) — `on_prepare()` delegates to `on_prepare_data()`, `on_prepare_model()`, and `on_prepare_metrics()`; `on_execute()` runs `on_train()` then `on_evaluate()`.
 
-## More About the Framework
+## Authoring a Job
 
-If you are interested in the internal code structure, see [crucible/README.md](crucible/README.md).
-		abstract.py
-runs/
-tests/
+Scaffold with `crucible create`, or add a package under `jobs/<name>/` manually:
 
-## Create a New Run
-
-Use the create command:
-
-```bash
-uv run crucible create my_experiment --job-type standalone
-```
-
-Or scaffold a training job:
-
-```bash
-uv run crucible create my_experiment --job-type training
-```
-
-Templates are file-based under `interface/cli/templates/`, so you can customize scaffold output without editing CLI code.
-
-This creates:
-
-- `my_runs/my_experiment/__init__.py`
-- `my_runs/my_experiment/runner.py`
-- `my_runs/my_experiment/README.md`
-- `my_runs/my_experiment/configs/default.yaml`
-- `my_runs/my_experiment/outputs/`
-
-You can overwrite existing scaffold files with:
-
-```bash
-uv run crucible create my_experiment --job-type standalone --force
-```
-
-Manual setup is still supported.
-
-Add a package under `runs/`, for example `my_runs/my_experiment/`:
-
-1. Create `my_runs/my_experiment/__init__.py`
-2. Create `my_runs/my_experiment/runner.py` with a concrete `AbstractJob` subclass
-3. Export `Job` or `JOB_CLASS` from `__init__.py`
-4. Add `my_runs/my_experiment/configs/default.yaml`
-
-Minimal pattern:
+- `__init__.py` — export `Job` or `JOB_CLASS`
+- `job.py` — concrete `AbstractJob` subclass
+- `configs/default.yaml` — run config
 
 ```python
 from crucible.core.jobs import AbstractJob
 
 
 class Job(AbstractJob):
-		def setup_data(self) -> None:
-				self.data = {"status": "ready"}
+    def on_prepare(self) -> None:
+        self.data = {"status": "ready"}
 
-		def run(self):
-				self.setup()
-				return {"status": "ok"}
+    def on_execute(self):
+        return {"status": "ok"}
 
 
 JOB_CLASS = Job
 ```
 
-After that, your run should appear automatically in:
-
-```bash
-uv run crucible list
-```
+Templates live in `crucible/interface/cli/templates/` and can be customized without editing CLI code. For internal structure, see [crucible/README.md](../crucible/README.md).
 
 ## Testing
-
-Run tests with:
 
 ```bash
 uv run pytest
@@ -159,5 +93,5 @@ uv run pytest
 
 ## Notes
 
-- Runtime logging settings are read from config keys like `log_dir`, `log_console_level`, and `log_file_level`.
-- The project includes a Weights & Biases tracker abstraction in `core/trackers/wandb.py` for experiment tracking integration.
+- Logging config keys: `log_dir`, `log_console_level`, `log_file_level`.
+- Experiment tracking: `crucible/core/trackers/wandb.py`.

@@ -1,5 +1,3 @@
-from __future__ import annotations
-
 import shutil
 from pathlib import Path
 
@@ -10,7 +8,7 @@ import crucible.interface.cli.utils as ui_utils
 REAL_TEMPLATES_DIR = Path(__file__).resolve().parents[1] / "interface" / "cli" / "templates"
 FIXTURES_DIR = Path(__file__).resolve().parent / "fixtures" / "templates"
 
-SAMPLE_RUN_NAME = "test_run"
+SAMPLE_JOB_NAME = "test_job"
 
 
 # ---------------------------------------------------------------------------
@@ -19,14 +17,14 @@ SAMPLE_RUN_NAME = "test_run"
 # ---------------------------------------------------------------------------
 
 
-def test_validate_accepts_standalone_runner_template() -> None:
-	rendered = ui_utils._render_template("runner_standalone.py.tpl", run_name=SAMPLE_RUN_NAME)
-	ui_utils._validate_rendered_template("runner_standalone.py.tpl", rendered)
+def test_validate_accepts_plain_job_template() -> None:
+	rendered = ui_utils._render_template("job_plain.py.tpl", job_name=SAMPLE_JOB_NAME)
+	ui_utils._validate_rendered_template("job_plain.py.tpl", rendered)
 
 
-def test_validate_accepts_training_runner_template() -> None:
-	rendered = ui_utils._render_template("runner_training.py.tpl", run_name=SAMPLE_RUN_NAME)
-	ui_utils._validate_rendered_template("runner_training.py.tpl", rendered)
+def test_validate_accepts_trainer_job_template() -> None:
+	rendered = ui_utils._render_template("job_trainer.py.tpl", job_name=SAMPLE_JOB_NAME)
+	ui_utils._validate_rendered_template("job_trainer.py.tpl", rendered)
 
 
 def test_validate_accepts_init_template() -> None:
@@ -47,9 +45,9 @@ def test_validate_accepts_default_yaml_template() -> None:
 
 def test_validate_rejects_broken_python_template() -> None:
 	tpl = (FIXTURES_DIR / "broken_python.py.tpl").read_text(encoding="utf-8")
-	rendered = tpl.format(run_name=SAMPLE_RUN_NAME)
+	rendered = tpl.format(job_name=SAMPLE_JOB_NAME)
 	with pytest.raises(ValueError, match="not valid Python"):
-		ui_utils._validate_rendered_template("runner_standalone.py.tpl", rendered)
+		ui_utils._validate_rendered_template("job_plain.py.tpl", rendered)
 
 
 def test_validate_rejects_broken_yaml_template() -> None:
@@ -59,7 +57,7 @@ def test_validate_rejects_broken_yaml_template() -> None:
 
 
 # ---------------------------------------------------------------------------
-# Integration: create_run_package must call _validate_rendered_template.
+# Integration: create_job_package must call _validate_rendered_template.
 # Proven by giving it a broken template and asserting no files are written.
 # ---------------------------------------------------------------------------
 
@@ -73,33 +71,33 @@ def _build_template_dir(tmp_path: Path, *, replace: dict[str, Path]) -> Path:
 	return tpl_dir
 
 
-def test_create_run_package_fails_and_writes_nothing_on_broken_python_template(
+def test_create_job_package_fails_and_writes_nothing_on_broken_python_template(
 	tmp_path: Path, monkeypatch: pytest.MonkeyPatch
 ) -> None:
-	runs_root = tmp_path / "runs"
+	jobs_root = tmp_path / "jobs"
 	tpl_dir = _build_template_dir(
-		tmp_path, replace={"runner_standalone.py.tpl": FIXTURES_DIR / "broken_python.py.tpl"}
+		tmp_path, replace={"job_plain.py.tpl": FIXTURES_DIR / "broken_python.py.tpl"}
 	)
-	monkeypatch.setattr(ui_utils, "RUNS_ROOT", runs_root)
+	monkeypatch.setattr(ui_utils, "JOBS_ROOT", jobs_root)
 	monkeypatch.setattr(ui_utils, "TEMPLATES_DIR", tpl_dir)
 
 	with pytest.raises(ValueError, match="not valid Python"):
-		ui_utils.create_run_package("my_exp", standalone=True)
+		ui_utils.create_job_package("my_exp", kind="job")
 
-	assert not (runs_root / "my_exp" / "runner.py").exists()
+	assert not (jobs_root / "my_exp" / "job.py").exists()
 
 
-def test_create_run_package_fails_and_writes_nothing_on_broken_yaml_template(
+def test_create_job_package_fails_and_writes_nothing_on_broken_yaml_template(
 	tmp_path: Path, monkeypatch: pytest.MonkeyPatch
 ) -> None:
-	runs_root = tmp_path / "runs"
+	jobs_root = tmp_path / "jobs"
 	tpl_dir = _build_template_dir(
 		tmp_path, replace={"default.yaml.tpl": FIXTURES_DIR / "broken_yaml.yaml.tpl"}
 	)
-	monkeypatch.setattr(ui_utils, "RUNS_ROOT", runs_root)
+	monkeypatch.setattr(ui_utils, "JOBS_ROOT", jobs_root)
 	monkeypatch.setattr(ui_utils, "TEMPLATES_DIR", tpl_dir)
 
 	with pytest.raises(ValueError, match="not valid YAML"):
-		ui_utils.create_run_package("my_exp", standalone=True)
+		ui_utils.create_job_package("my_exp", kind="job")
 
-	assert not (runs_root / "my_exp" / "configs" / "default.yaml").exists()
+	assert not (jobs_root / "my_exp" / "configs" / "default.yaml").exists()
