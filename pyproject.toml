@@ -7,7 +7,7 @@ name = "crucible"
 version = "0.1.0"
 description = "From paper or idea to runnable experiment with minimal friction."
 readme = "README.md"
-requires-python = ">=3.13"
+requires-python = ">=3.10"
 dependencies = [
     "accelerate>=1.13.0",
     "datasets>=4.8.4",

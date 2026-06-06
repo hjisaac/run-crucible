@@ -22,7 +22,7 @@ uv run crucible list
 uv run crucible run mlp
 ```
 
-Requires Python 3.13+ and [uv](https://docs.astral.sh/uv/).
+Requires Python 3.10+. [uv](https://docs.astral.sh/uv/) is recommended for install and runs.
 
 ## CLI
 
