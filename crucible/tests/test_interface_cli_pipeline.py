@@ -1,5 +1,3 @@
-from __future__ import annotations
-
 import ast
 import logging
 import sys
@@ -31,11 +29,10 @@ __JOB_SOURCE = dedent(
 	from crucible.core.jobs import AbstractJob
 
 	class Job(AbstractJob):
-	    def setup_data(self) -> None:
+	    def on_prepare(self) -> None:
 	        self.data = {'message': self.config['message']}
 
-	    def run(self) -> dict[str, str]:
-	        self.setup()
+	    def on_execute(self) -> dict[str, str]:
 	        return {
 	            'status': 'ok',
 	            'message': self.data['message'],

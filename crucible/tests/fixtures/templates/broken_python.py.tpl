@@ -2,11 +2,10 @@ from crucible.core.jobs import AbstractJob
 
 
 class Job(AbstractJob)
-	def setup_data(self) -> None:
+	def on_prepare(self) -> None:
 		self.data = {{"status": "ready"}}
 
-	def run(self) -> dict[str, str]:
-		self.setup()
+	def on_execute(self) -> dict[str, str]:
 		return {{"status": "ok", "job": "{job_name}"}}
 
 

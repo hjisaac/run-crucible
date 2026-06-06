@@ -1,5 +1,6 @@
 from abc import ABCMeta, abstractmethod
 from datetime import datetime
+from typing import Any
 
 from dotenv import load_dotenv
 
@@ -14,6 +15,7 @@ class AbstractJob(metaclass=ABCMeta):
 	def __init__(self, config) -> None:
 		self.config = config
 		self._run_id = self._build_run_id()
+		self.tracker = None
 		configure_logging(config, self._run_id)
 
 	@staticmethod
@@ -26,16 +28,51 @@ class AbstractJob(metaclass=ABCMeta):
 		"""Unique identifier for a single run (execution) of this job, used for logging and tracking."""
 		return self._run_id
 
-	@abstractmethod
-	def setup_data(self) -> None:
+	def execute(self) -> Any:
+		"""Run the full job lifecycle: prepare, execute, finalize, and teardown."""
+		self.on_start()
+		self.on_prepare()
+		self.on_track()
+
+		result = None
+		try:
+			result = self.on_execute()
+			self.on_finalize(result)
+			return result
+		except Exception as exc:
+			self.on_fail(exc)
+			raise
+		finally:
+			self.on_teardown()
+
+	def on_start(self) -> None:
+		"""Optional hook before preparation (logging banners, config validation)."""
 		pass
 
-	def setup(self) -> None:
-		self.setup_data()
+	@abstractmethod
+	def on_prepare(self) -> None:
+		"""Prepare runtime state on ``self`` (data paths, clients, datasets, etc.)."""
+		pass
 
-	def setup_tracker(self) -> None:
+	def on_track(self) -> None:
+		"""Optional hook to attach an experiment tracker to ``self.tracker``."""
 		self.tracker = None
 
 	@abstractmethod
-	def run(self) -> None:
+	def on_execute(self) -> Any:
+		"""Run the job's main work and return a small, serializable result."""
 		pass
+
+	def on_finalize(self, result: Any) -> None:
+		"""Post-run hook: persist artifacts, log summaries, etc."""
+		if self.tracker is not None and isinstance(result, dict):
+			self.tracker.track_summary(**result)
+
+	def on_fail(self, exc: BaseException) -> None:
+		"""Optional hook when ``on_execute`` raises."""
+		pass
+
+	def on_teardown(self) -> None:
+		"""Always runs in ``finally``; close trackers and release resources."""
+		if self.tracker is not None:
+			self.tracker.finish()

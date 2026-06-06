@@ -1,5 +1,3 @@
-from __future__ import annotations
-
 import logging
 from pathlib import Path
 from typing import Any
@@ -30,4 +28,4 @@ def run_named_job(job_name: str, config_name: str, overrides: list[str] | None =
     config, config_path, resolved_overrides = load_run_config(job_name, config_name, overrides=overrides)
     _log_runtime_config(job_name, config_path, config, resolved_overrides)
     job = job_class(config=config)
-    return job.run()
+    return job.execute()

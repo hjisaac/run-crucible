@@ -1,6 +1,6 @@
 # Crucible Framework Code Structure
 
-This document describes the internal structure of the `crucible/` folder, which contains all framework, plugin, and interface code for the run-crucible project. This is intended for contributors and advanced users interested in the internals.
+This document describes the internal structure of the `crucible/` folder, which contains all framework, plugin, and interface code for RunCrucible. This is intended for contributors and advanced users interested in the internals.
 
 ## crucible/
 - `core/` — Core abstractions, runtime, config, job interfaces, trackers, and utilities

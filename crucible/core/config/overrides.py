@@ -1,6 +1,3 @@
-from __future__ import annotations
-
-
 def sanitize_overrides(overrides: list[str] | None) -> list[str]:
     """Return normalized Hydra override strings, dropping empty values."""
     if not overrides:
