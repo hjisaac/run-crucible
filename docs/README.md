@@ -22,7 +22,7 @@ uv run crucible list
 uv run crucible run mlp
 ```
 
-Requires Python 3.10+. [uv](https://docs.astral.sh/uv/) is recommended for install and runs.
+Requires Python 3.11+ (driven by dependencies such as numpy). [uv](https://docs.astral.sh/uv/) is recommended for install and runs.
 
 ## CLI
 
@@ -38,7 +38,7 @@ Direct commands (e.g. `uv run crucible mlp`) are still supported.
 
 ## Job Lifecycle Hooks
 
-The runtime calls `job.execute()`. Each run follows a fixed hook order:
+The design is inspired by React and Vue component lifecycle hook patterns. The runtime calls `job.execute()`; the "framework" owns the order, you implement the hooks:
 
 ```text
 execute()
