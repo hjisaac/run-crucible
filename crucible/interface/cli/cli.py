@@ -58,8 +58,8 @@ def list_jobs() -> None:
 		typer.echo(job_name)
 
 
-@app.command("run")
-def run_named(
+@app.command("execute")
+def execute_named(
 	job_name: str = typer.Argument(..., help="Discovered job name (e.g. mlp)."),
 	config: str = typer.Option(
 		"default",
@@ -74,7 +74,7 @@ def run_named(
 		help="Hydra-style override(s), e.g. -o trainer.lr=1e-3 (repeat flag for multiple).",
 	),
 ) -> None:
-	"""Start a run of a discovered crucible job by name."""
+	"""Execute a discovered crucible job by name (produces one run)."""
 	_run_command(job_name, config, overrides=overrides)
 
 

@@ -10,7 +10,7 @@ RunCrucible uses three words, each with exactly one meaning:
 
 - **Job** — the unit of work you author: a Python package under `jobs/<name>/` containing a `Job` class.
 - **Run** — a single execution of a job. Each run gets a unique `run_id` and its own log file.
-- **`run`** (the CLI verb) — start a run of a job.
+- **`execute`** (the CLI verb) — execute a job (produces one run).
 
 Reusable ML building blocks (models, optimizers, schedulers) live in `crucible/plugins/ml/` and are never jobs themselves.
 
@@ -19,7 +19,7 @@ Reusable ML building blocks (models, optimizers, schedulers) live in `crucible/p
 ```bash
 uv sync
 uv run crucible list
-uv run crucible run mlp
+uv run crucible execute mlp
 ```
 
 Requires Python 3.11+ (driven by dependencies such as numpy). [uv](https://docs.astral.sh/uv/) is recommended for install and runs.
@@ -28,7 +28,7 @@ Requires Python 3.11+ (driven by dependencies such as numpy). [uv](https://docs.
 
 ```bash
 uv run crucible list
-uv run crucible run <job> --config default -o log_console_level=DEBUG
+uv run crucible execute <job> --config default -o log_console_level=DEBUG
 uv run crucible create <name> --kind job      # plain job
 uv run crucible create <name> --kind trainer  # trainer scaffold
 uv run crucible create <name> --kind job --force

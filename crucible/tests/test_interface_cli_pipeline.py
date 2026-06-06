@@ -263,13 +263,13 @@ def test_cli_create_command_rejects_reserved_name(tmp_path, monkeypatch) -> None
 	monkeypatch.setattr(ui_utils, "JOBS_ROOT", jobs_root)
 
 	runner = CliRunner()
-	result = runner.invoke(ui_cli.app, ["create", "run"])
+	result = runner.invoke(ui_cli.app, ["create", "execute"])
 
 	assert result.exit_code != 0
 	assert "reserved by the CLI" in result.output
 
 
-def test_cli_run_subcommand_forwards_args(monkeypatch) -> None:
+def test_cli_execute_subcommand_forwards_args(monkeypatch) -> None:
 	captured: dict[str, object] = {}
 
 	def _fake_run_named_job(job_name: str, config_name: str, overrides: list[str] | None = None):
@@ -281,7 +281,7 @@ def test_cli_run_subcommand_forwards_args(monkeypatch) -> None:
 	monkeypatch.setattr(ui_cli, "run_named_job", _fake_run_named_job)
 
 	runner = CliRunner()
-	result = runner.invoke(ui_cli.app, ["run", "demo", "--config", "default", "-o", "a=b", "-o", "c=d"])
+	result = runner.invoke(ui_cli.app, ["execute", "demo", "--config", "default", "-o", "a=b", "-o", "c=d"])
 
 	assert result.exit_code == 0
 	assert captured == {
