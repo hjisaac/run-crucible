@@ -22,7 +22,7 @@ def _normalize_job_name(job_name: str) -> str:
 	normalized = job_name.strip().lower()
 	if not normalized:
 		raise ValueError("Job name cannot be empty.")
-	if normalized in {"list", "run", "create"}:
+	if normalized in {"list", "execute", "create"}:
 		raise ValueError(f"Job name '{normalized}' is reserved by the CLI.")
 	if not JOB_NAME_PATTERN.match(normalized):
 		raise ValueError(
